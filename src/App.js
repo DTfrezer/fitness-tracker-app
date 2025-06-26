@@ -1,5 +1,6 @@
 // File: App.js
-
+import './App.css';
+import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import {
   Button, Form, Container, Row, Col, Card, Spinner, Table, Alert
@@ -30,6 +31,9 @@ export default App;
 
 // ---------------------- Auth Page ----------------------
 
+// Inside App.js
+ // ✅ Add this at top of file
+
 function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,7 +57,10 @@ function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) return setError('Email and password are required.');
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
+    }
     setIsLoading(true);
     try {
       if (isSignUp) {
@@ -73,7 +80,7 @@ function AuthPage() {
   const cardClass = darkMode ? 'bg-secondary text-white' : '';
 
   return (
-    <div className={containerClass}>
+    <div className={`${containerClass} animated-bg`}>
       <Container className="py-4">
         <Row className="justify-content-end mb-3">
           <Col md="auto">
@@ -84,38 +91,47 @@ function AuthPage() {
         </Row>
         <Row className="justify-content-center">
           <Col md={6}>
-            <Card className={`p-4 shadow ${cardClass}`}>
-              <h2 className="text-center mb-4">{isSignUp ? 'Sign Up' : 'Login'}</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="formEmail">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-                <Button variant="primary" type="submit" disabled={isLoading} className="w-100">
-                  {isLoading ? <Spinner size="sm" animation="border" className="me-2" /> : isSignUp ? 'Sign Up' : 'Sign In'}
-                </Button>
-              </Form>
-              <div className="text-center mt-3">
-                <Button variant="link" onClick={() => setIsSignUp(!isSignUp)}>
-                  {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
-                </Button>
-              </div>
-            </Card>
+            {/* 👇 Animation Wrapper */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <Card className={`p-4 shadow ${cardClass}`}>
+                <h2 className="text-center mb-4">{isSignUp ? 'Sign Up' : 'Login'}</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3" controlId="formEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit" disabled={isLoading} className="w-100">
+                    {isLoading ? (
+                      <Spinner size="sm" animation="border" className="me-2" />
+                    ) : isSignUp ? 'Sign Up' : 'Sign In'}
+                  </Button>
+                </Form>
+                <div className="text-center mt-3">
+                  <Button variant="link" onClick={() => setIsSignUp(!isSignUp)}>
+                    {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
           </Col>
         </Row>
       </Container>
@@ -179,7 +195,7 @@ function FitnessTracker() {
         waterIntake,
         calories,
         timestamp: new Date(),
-        userEmail: auth.currentUser.email, // <-- Add this
+        userEmail: auth.currentUser.email,
       });
       setFitnessData(prev => [
         { steps, waterIntake, calories, timestamp: new Date() },
@@ -200,11 +216,11 @@ function FitnessTracker() {
     navigate('/');
   };
 
-  const containerClass = darkMode ? 'bg-dark text-white min-vh-100' : 'bg-light text-dark min-vh-100';
+  const containerClass = darkMode ? 'text-white' : 'text-dark';
   const cardClass = darkMode ? 'bg-secondary text-white' : '';
 
   return (
-    <div className={containerClass}>
+    <div className={`animated-bg ${containerClass}`}>
       <Container className="py-4">
         <Row className="justify-content-between mb-3">
           <Col md="auto">
@@ -322,16 +338,10 @@ function Dashboard() {
       const entries = snapshot.docs.map((doc) => doc.data());
 
       const statsMap = {};
-
       entries.forEach(({ userEmail, steps, calories, waterIntake }) => {
         if (!statsMap[userEmail]) {
-          statsMap[userEmail] = {
-            steps: 0,
-            calories: 0,
-            waterIntake: 0,
-          };
+          statsMap[userEmail] = { steps: 0, calories: 0, waterIntake: 0 };
         }
-
         statsMap[userEmail].steps += Number(steps);
         statsMap[userEmail].calories += Number(calories);
         statsMap[userEmail].waterIntake += Number(waterIntake);
@@ -351,10 +361,10 @@ function Dashboard() {
     }
   };
 
-  const containerClass = darkMode ? 'bg-dark text-white min-vh-100' : 'bg-light text-dark min-vh-100';
+  const containerClass = darkMode ? 'text-white' : 'text-dark';
 
   return (
-    <div className={containerClass}>
+    <div className={`animated-bg ${containerClass}`}>
       <Container className="py-4">
         <Row className="justify-content-between mb-3">
           <Col md="auto">
@@ -403,4 +413,3 @@ function Dashboard() {
     </div>
   );
 }
-
